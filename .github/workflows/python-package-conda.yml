@@ -1,0 +1,46 @@
+name: Python Package using Conda
+
+on: [push]  # Trigger the workflow on push events
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest  # Use the latest Ubuntu runner
+    strategy:
+      max-parallel: 5  # Allows up to 5 parallel jobs (if your matrix supports it)
+
+    steps:
+    - uses: actions/checkout@v4  # Checkout the repository to get the code
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v3  # Set up Python 3.10 environment
+      with:
+        python-version: '3.10'
+
+    - name: Add conda to system path
+      run: |
+        # $CONDA is an environment variable pointing to the root of the miniconda directory
+        echo $CONDA/bin >> $GITHUB_PATH
+
+    - name: Install dependencies from environment.yml
+      run: |
+        conda env update --file environment.yml --name base  # Install dependencies using conda environment.yml
+
+    - name: Lint with flake8
+      run: |
+        conda install flake8  # Install flake8 for linting
+        # Lint the code, catching errors like syntax or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # Additional linting with exit-zero for warnings and complexity checks
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+    - name: Install pytest
+      run: |
+        conda install pytest  # Install pytest for testing
+
+    - name: Run tests 
+
+
+        
+    - name: Test with pytest
+      run: |
+        conda install pytest
+        pytest
